@@ -3,52 +3,956 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Santiago Encina - Autor</title>
+    <title>Santiago Encina - Portal del Lector</title>
+    <!-- SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        * { box-sizing: border-box; }
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            max-width: 700px; 
+            max-width: 1000px; 
             margin: 0 auto; 
-            padding: 40px 20px; 
-            text-align: center; 
-            color: #222; 
+            padding: 15px 20px 40px 20px; 
+            color: #2b2b2b; 
             background: #faf8f5; 
         }
-        h1 { color: #1a1a1a; margin-bottom: 5px; }
-        p.sub { font-style: italic; color: #666; margin-top: 0; }
-        .card { 
-            background: #fff; 
+
+        /* BARRA SUPERIOR DE NAVEGACIÓN (NAVBAR) */
+        .navbar {
+            background: #ffffff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #1a1a1a;
+        }
+        .navbar-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn-nav {
+            background: transparent;
+            border: 1px solid #009ee3;
+            color: #009ee3;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 0.88em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-nav:hover {
+            background: #009ee3;
+            color: white;
+        }
+        .btn-nav-primary {
+            background: #009ee3;
+            color: white;
+        }
+        .btn-nav-primary:hover {
+            background: #0081b8;
+        }
+        .user-email {
+            font-size: 0.88em;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        /* Banner del Autor */
+        .autor-header {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            border-radius: 14px;
+            padding: 30px;
+            color: #ffffff;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .autor-header-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 1;
+        }
+
+        .autor-titulo-centrado {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            width: 100%;
+            margin: 0;
+            font-size: 2.2em;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+        }
+
+        .autor-contenido {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .autor-foto {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #ffffff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            flex-shrink: 0;
+        }
+
+        .autor-info {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+        }
+
+        .autor-info h2 {
+            margin: 0 0 8px 0;
+            font-size: 1.05em;
+            font-weight: 600;
+            color: #f1c40f;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .autor-info p {
+            margin: 0;
+            font-size: 0.95em;
+            line-height: 1.55;
+            color: #f0f0f0;
+            text-align: justify;
+        }
+
+        /* Marquesina */
+        .marquesina-container {
+            background: #1a1a1a;
+            color: #f1c40f;
+            padding: 10px 0;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95em;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .mensaje-alerta {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+        .exito { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Catálogo de Libros */
+        .catalogo-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .card-libro { 
+            background: #ffffff; 
             padding: 25px; 
             border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.06); 
-            margin-top: 30px; 
+            box-shadow: 0 4px 18px rgba(0,0,0,0.05); 
+            display: flex;
+            flex-direction: row;
+            gap: 25px;
+            align-items: flex-start;
+            height: 480px; 
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .btn-mp { 
+        .card-libro:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+        }
+        
+        .portada-container {
+            flex-shrink: 0;
+            width: 210px;
+            text-align: center;
+        }
+        .portada {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+        }
+
+        .info-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .titulo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 4px;
+        }
+        
+        .info-container h3 {
+            font-size: 1.5em;
+            color: #1a1a1a;
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        .badge-img {
+            height: 28px;
+            width: auto;
+            object-fit: contain;
+            vertical-align: middle;
+        }
+
+        .meta-info {
+            font-size: 0.88em;
+            color: #777;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+        .meta-info span {
+            color: #444;
+            font-weight: 500;
+        }
+
+        .sinopsis-scroll {
+            color: #4a4a4a; 
+            font-size: 0.95em; 
+            line-height: 1.6; 
+            text-align: justify;
+            padding-right: 12px;
+            margin-bottom: 10px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .sinopsis-scroll::-webkit-scrollbar { width: 6px; }
+        .sinopsis-scroll::-webkit-scrollbar-thumb { background-color: #d1cabe; border-radius: 4px; }
+        .sinopsis-scroll::-webkit-scrollbar-track { background: #f5f2eb; }
+
+        .comprar-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid #f0ebe1;
+            padding-top: 10px;
+            margin-top: auto;
+            gap: 15px;
+            flex-shrink: 0;
+            background: #ffffff;
+        }
+
+        .precio-comentarios-box {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .precio {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .btn-comentarios {
+            background: #f0ebe1;
+            color: #4a4a4a;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-comentarios:hover {
+            background: #e2dacd;
+            color: #1a1a1a;
+        }
+        
+        .btn-comprar { 
             background: #009ee3; 
             color: white; 
-            padding: 14px 28px; 
-            text-decoration: none; 
+            padding: 10px 24px; 
+            border: none;
             border-radius: 6px; 
             font-weight: bold; 
-            display: inline-block; 
-            margin-top: 20px; 
-            font-size: 1.1em;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.2s;
+            white-space: nowrap;
         }
-        .btn-mp:hover { background: #0081b8; }
+        .btn-comprar:hover { background: #0081b8; }
+        .btn-comprar:disabled { background: #ccc; cursor: not-allowed; }
+
+        .tiendas-externas-box {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-top: 8px;
+            margin-top: 6px;
+            border-top: 1px dashed #e8e3d8;
+            flex-shrink: 0;
+        }
+
+        .tienda-fila {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #555;
+            background: #fcfbf9;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        .tienda-link {
+            color: #00732e;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .tienda-link:hover { text-decoration: underline; }
+
+        .formatos-pills { display: flex; gap: 5px; }
+
+        .pill-formato {
+            background: #eef2f5;
+            color: #334e68;
+            font-size: 0.78em;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-weight: 500;
+            border: 1px solid #d9e2ec;
+        }
+
+        /* MODALES GENERIClOS */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.25em; color: #1a1a1a; }
+        .btn-cerrar {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #888;
+        }
+        .btn-cerrar:hover { color: #000; }
+
+        .form-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .form-auth input {
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+        .btn-submit-auth {
+            background: #009ee3;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 5px;
+        }
+        .btn-submit-auth:hover { background: #0081b8; }
+
+        /* Lista Comentarios Modal */
+        .lista-comentarios {
+            overflow-y: auto;
+            max-height: 250px;
+            margin-bottom: 15px;
+            padding-right: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .comentario-item {
+            background: #f9f8f6;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border-left: 3px solid #009ee3;
+        }
+        .comentario-item strong { color: #1a1a1a; font-size: 0.95em; }
+        .comentario-item p { margin: 5px 0 0 0; color: #444; font-size: 0.92em; line-height: 1.4; }
+
+        @media (max-width: 650px) {
+            .navbar { flex-direction: column; gap: 10px; text-align: center; }
+            .autor-contenido { flex-direction: column; text-align: center; }
+            .autor-info p { text-align: center; }
+            .card-libro { flex-direction: column; height: auto; align-items: center; padding: 20px; }
+            .portada-container { width: 170px; margin-bottom: 10px; }
+            .info-container { height: auto; width: 100%; }
+            .sinopsis-scroll { max-height: 200px; }
+            .comprar-row { flex-direction: column; align-items: stretch; text-align: center; gap: 12px; }
+            .precio-comentarios-box { justify-content: space-between; }
+            .btn-comprar { width: 100%; }
+            .tienda-fila { flex-direction: column; gap: 4px; text-align: center; }
+        }
     </style>
 </head>
 <body>
 
-    <h1>Santiago Encina</h1>
-    <p class="sub">Escritor & Autor Independiente</p>
-
-    <div class="card">
-        <h2>El Secreto del Almacén de Ramos Generales</h2>
-        <p>Acompañá al detective Mariano Cardoso en este apasionante misterio ambientado en 1960 en Fortín Culebra.</p>
-        
-        <!-- Cuando tengas el Link de Pago de Mercado Pago, reemplazás el # de abajo -->
-        <a href="#" class="btn-mp">Adquirir Licencia ($ ARS)</a>
+    <!-- NAV BAR SUPERIOR -->
+    <div class="navbar">
+        <div class="navbar-brand">📚 Santiago Encina - Portal</div>
+        <div class="navbar-actions" id="nav-actions">
+            <button class="btn-nav" onclick="abrirModal('modal-soporte')">Soporte</button>
+            <button class="btn-nav" onclick="abrirModal('modal-login')">Iniciar Sesión</button>
+            <button class="btn-nav btn-nav-primary" onclick="abrirModal('modal-registro')">Registrarse</button>
+        </div>
     </div>
 
+    <!-- Banner del Autor -->
+    <div id="seccion-autor" class="autor-header" style="display:none;">
+        <div class="autor-header-overlay"></div>
+        <h1 class="autor-titulo-centrado">Bienvenidos</h1>
+        <div class="autor-contenido">
+            <img id="autor-foto" src="" alt="Foto de Autor" class="autor-foto">
+            <div class="autor-info">
+                <h2>Biografía</h2>
+                <p id="autor-biografia"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marquesina -->
+    <div id="seccion-marquesina" class="marquesina-container" style="display:none;">
+        <marquee id="autor-mensaje" behavior="scroll" direction="left" scrollamount="6"></marquee>
+    </div>
+
+    <div id="alerta-pago" class="mensaje-alerta"></div>
+
+    <!-- Catálogo de Libros -->
+    <div class="catalogo-container" id="contenedor-catalogo">
+        <p style="text-align:center;">Cargando catálogo desde el servidor...</p>
+    </div>
+
+    <!-- MODAL: REGISTRO -->
+    <div id="modal-registro" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Crear Cuenta de Lector</h3>
+                <button class="btn-cerrar" onclick="cerrarModal('modal-registro')">&times;</button>
+            </div>
+            <form class="form-auth" onsubmit="ejecutarRegistro(event)">
+                <input type="email" id="reg-email" placeholder="Correo electrónico" required>
+                <input type="password" id="reg-password" placeholder="Contraseña (mínimo 6 caracteres)" minlength="6" required>
+                <button type="submit" class="btn-submit-auth">Registrarme</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: LOGIN -->
+    <div id="modal-login" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Iniciar Sesión</h3>
+                <button class="btn-cerrar" onclick="cerrarModal('modal-login')">&times;</button>
+            </div>
+            <form class="form-auth" onsubmit="ejecutarLogin(event)">
+                <input type="email" id="login-email" placeholder="Correo electrónico" required>
+                <input type="password" id="login-password" placeholder="Contraseña" required>
+                <button type="submit" class="btn-submit-auth">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: SOPORTE / CONTACTO -->
+    <div id="modal-soporte" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Contacto y Soporte</h3>
+                <button class="btn-cerrar" onclick="cerrarModal('modal-soporte')">&times;</button>
+            </div>
+            <p style="font-size:0.9em; color:#555; margin-bottom:12px;">
+                ¿Tenés alguna consulta o comentario? Escribinos a continuación y te responderemos a la brevedad.
+            </p>
+            <form class="form-auth" onsubmit="enviarMensajeSoporte(event)">
+                <input type="text" id="soporte-asunto" placeholder="Asunto de la consulta" required>
+                <textarea id="soporte-mensaje" placeholder="Escribí tu mensaje aquí..." style="padding:10px; border:1px solid #ccc; border-radius:6px; resize:none; height:100px;" required></textarea>
+                <button type="submit" class="btn-submit-auth" style="background:#009ee3;">Enviar Mensaje</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: COMENTARIOS -->
+    <div id="modal-comentarios" class="modal-overlay">
+        <div class="modal-box" style="max-width:550px;">
+            <div class="modal-header">
+                <h3 id="modal-titulo-libro">Comentarios</h3>
+                <button class="btn-cerrar" onclick="cerrarModal('modal-comentarios')">&times;</button>
+            </div>
+            <div id="lista-comentarios" class="lista-comentarios">
+                <p style="text-align:center; color:#888;">Cargando comentarios...</p>
+            </div>
+            <form id="form-nuevo-comentario" class="form-auth" style="border-top:1px solid #eee; padding-top:15px;" onsubmit="guardarComentario(event)">
+                <input type="text" id="input-nombre" placeholder="Tu nombre" required>
+                <textarea id="input-texto" placeholder="Escribí tu comentario..." style="padding:10px; border:1px solid #ccc; border-radius:6px; resize:none; height:70px;" required></textarea>
+                <button type="submit" class="btn-submit-auth" style="background:#2e7d32;">Publicar Comentario</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://kpltcxhnqhgzgxazhgbv.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_rdFjhKYduJglnoq-D0jHOw_7ik0VaFG"; 
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const libroFiltro = urlParams.get('libro'); 
+        let userId = urlParams.get('user') || 'anonimo';
+        const estadoPago = urlParams.get('estado');
+
+        let imgNuevoUrl = "";
+        let imgOfertaUrl = "";
+        let libroActualComentarios = null;
+        let usuarioSesion = null;
+        let mailAutor = "";
+
+        // Mostrar estado del pago
+        const alertaEl = document.getElementById('alerta-pago');
+        if (estadoPago === 'exito') {
+            alertaEl.className = "mensaje-alerta exito";
+            alertaEl.innerText = "¡Pago procesado con éxito! Ya podés disfrutar de tu lectura.";
+            alertaEl.style.display = "block";
+        } else if (estadoPago === 'error') {
+            alertaEl.className = "mensaje-alerta error";
+            alertaEl.innerText = "Hubo un problema con el pago. Por favor intentá nuevamente.";
+            alertaEl.style.display = "block";
+        }
+
+        // VERIFICAR AUTENTICACIÓN / SESIÓN ACTIVA
+        async function revisarSesion() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const navActions = document.getElementById('nav-actions');
+
+            if (session && session.user) {
+                usuarioSesion = session.user;
+                userId = session.user.id; // Actualizamos el ID real del usuario
+                navActions.innerHTML = `
+                    <span class="user-email">👤 ${session.user.email}</span>
+                    <button class="btn-nav" onclick="abrirModal('modal-soporte')">Soporte</button>
+                    <button class="btn-nav" onclick="cerrarSesion()">Cerrar Sesión</button>
+                `;
+            } else {
+                usuarioSesion = null;
+                navActions.innerHTML = `
+                    <button class="btn-nav" onclick="abrirModal('modal-soporte')">Soporte</button>
+                    <button class="btn-nav" onclick="abrirModal('modal-login')">Iniciar Sesión</button>
+                    <button class="btn-nav btn-nav-primary" onclick="abrirModal('modal-registro')">Registrarse</button>
+                `;
+            }
+        }
+
+        // FUNCIONES DE AUTH
+        async function ejecutarRegistro(e) {
+            e.preventDefault();
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+
+            const { data, error } = await supabaseClient.auth.signUp({ email, password });
+
+            if (error) {
+                alert("Error al registrarse: " + error.message);
+            } else {
+                alert("¡Cuenta creada exitosamente! Ya podés iniciar sesión.");
+                cerrarModal('modal-registro');
+                revisarSesion();
+            }
+        }
+
+        async function ejecutarLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                alert("Error de inicio de sesión: " + error.message);
+            } else {
+                cerrarModal('modal-login');
+                revisarSesion();
+            }
+        }
+
+        async function cerrarSesion() {
+            await supabaseClient.auth.signOut();
+            revisarSesion();
+        }
+
+        // FUNCIONES MODALES
+        function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // DATOS AUTOR
+        async function cargarDatosAutor() {
+            try {
+                const { data: autor, error } = await supabaseClient
+                    .from('autor')
+                    .select('*')
+                    .eq('id', 1)
+                    .single();
+
+                if (error || !autor) return;
+
+                imgNuevoUrl = autor.img_nuevo_url || "";
+                imgOfertaUrl = autor.img_oferta_url || "";
+                mailAutor = autor.mail || "";
+
+                const headerEl = document.getElementById('seccion-autor');
+                if (autor.img_fondo_url) {
+                    headerEl.style.backgroundImage = `url('${autor.img_fondo_url}')`;
+                }
+                document.getElementById('autor-foto').src = autor.img_foto_url || '';
+                document.getElementById('autor-biografia').innerText = autor.biografia || '';
+                headerEl.style.display = 'flex';
+
+                if (autor.mensage) {
+                    document.getElementById('autor-mensaje').innerText = autor.mensage;
+                    document.getElementById('seccion-marquesina').style.display = 'block';
+                }
+            } catch (err) {
+                console.error("Error al cargar autor:", err);
+            }
+        }
+
+        // CATÁLOGO
+        async function cargarCatalogo() {
+            const contenedor = document.getElementById('contenedor-catalogo');
+
+            try {
+                let query = supabaseClient.from('libros').select('*');
+
+                if (libroFiltro) {
+                    query = query.eq('id', libroFiltro);
+                }
+
+                const { data: libros, error } = await query;
+
+                if (error || !libros || libros.length === 0) {
+                    contenedor.innerHTML = "<p style='text-align:center;'>No hay libros disponibles en este momento.</p>";
+                    return;
+                }
+
+                contenedor.innerHTML = "";
+
+                for (const libro of libros) {
+                    const { count } = await supabaseClient
+                        .from('comentarios')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('libro_id', libro.id);
+
+                    const totalComentarios = count || 0;
+
+                    let badgesHtml = '';
+                    if (libro.es_nuevo && imgNuevoUrl) {
+                        badgesHtml += `<img src="${imgNuevoUrl}" alt="Novedad" class="badge-img"> `;
+                    }
+                    if (libro.es_oferta && imgOfertaUrl) {
+                        badgesHtml += `<img src="${imgOfertaUrl}" alt="Oferta" class="badge-img">`;
+                    }
+
+                    const precioMostrado = libro.precio ? libro.precio : (libro.precio_ars ? libro.precio_ars : '0');
+                    const palabrasInfo = libro.cant_palabras ? ` | 📖 ${Number(libro.cant_palabras).toLocaleString('es-AR')} palabras` : '';
+
+                    let filaAmazonHtml = '';
+                    if (libro.amz_activo) {
+                        let formatosAmz = '';
+                        if (libro.amz_ebook) formatosAmz += `<span class="pill-formato">e-Book</span> `;
+                        if (libro.amz_blanda) formatosAmz += `<span class="pill-formato">Tapa Blanda</span> `;
+                        if (libro.amz_dura) formatosAmz += `<span class="pill-formato">Tapa Dura</span>`;
+
+                        filaAmazonHtml = `
+                            <div class="tienda-fila">
+                                <a href="${libro.amz_url || '#'}" target="_blank" class="tienda-link">
+                                    🛒 También disponible en Amazon ↗
+                                </a>
+                                <div class="formatos-pills">${formatosAmz}</div>
+                            </div>
+                        `;
+                    }
+
+                    let filaPublicaHtml = '';
+                    if (libro.pub_activo) {
+                        let formatosPub = '';
+                        if (libro.pub_ebook) formatosPub += `<span class="pill-formato">e-Book</span> `;
+                        if (libro.pub_blanda) formatosPub += `<span class="pill-formato">Tapa Blanda</span> `;
+                        if (libro.pub_dura) formatosPub += `<span class="pill-formato">Tapa Dura</span>`;
+
+                        filaPublicaHtml = `
+                            <div class="tienda-fila">
+                                <a href="${libro.pub_url || '#'}" target="_blank" class="tienda-link">
+                                    📖 Disponible en Publica.now ↗
+                                </a>
+                                <div class="formatos-pills">${formatosPub}</div>
+                            </div>
+                        `;
+                    }
+
+                    let cajaTiendasHtml = '';
+                    if (filaAmazonHtml || filaPublicaHtml) {
+                        cajaTiendasHtml = `
+                            <div class="tiendas-externas-box">
+                                ${filaAmazonHtml}
+                                ${filaPublicaHtml}
+                            </div>
+                        `;
+                    }
+
+                    const tarjeta = document.createElement('div');
+                    tarjeta.className = 'card-libro';
+                    tarjeta.innerHTML = `
+                        <div class="portada-container">
+                            <img src="${libro.portada_url || ''}" alt="Portada de ${libro.titulo}" class="portada">
+                        </div>
+                        <div class="info-container">
+                            <div>
+                                <div class="titulo-container">
+                                    <h3>${libro.titulo}</h3>
+                                    ${badgesHtml}
+                                </div>
+                                <div class="meta-info">
+                                    ${libro.autor ? `Por <span>${libro.autor}</span>` : ''} 
+                                    ${libro.genero ? `| Género: <span>${libro.genero}</span>` : ''}
+                                    ${palabrasInfo}
+                                </div>
+                            </div>
+                            <div class="sinopsis-scroll">
+                                ${libro.sinopsis || 'Sin descripción disponible.'}
+                            </div>
+                            <div class="comprar-row">
+                                <div class="precio-comentarios-box">
+                                    <div class="precio">$ ${precioMostrado} ARS</div>
+                                    <button class="btn-comentarios" onclick="abrirComentarios('${libro.id}', '${libro.titulo}')">
+                                        💬 <span id="count-${libro.id}">${totalComentarios}</span>
+                                    </button>
+                                </div>
+                                <button class="btn-comprar" id="btn-${libro.id}" onclick="iniciarPago('${libro.id}')">
+                                    Adquirir Licencia Digital
+                                </button>
+                            </div>
+                            ${cajaTiendasHtml}
+                        </div>
+                    `;
+                    contenedor.appendChild(tarjeta);
+                }
+
+            } catch (err) {
+                console.error("Excepción:", err);
+                contenedor.innerHTML = `<p style="color: red; text-align:center;">Ocurrió un error al cargar el catálogo.</p>`;
+            }
+        }
+
+        async function abrirComentarios(libroId, titulo) {
+            libroActualComentarios = libroId;
+            document.getElementById('modal-titulo-libro').innerText = `Comentarios: ${titulo}`;
+            
+            // Si el usuario está logueado, precompletar su nombre
+            if (usuarioSesion) {
+                document.getElementById('input-nombre').value = usuarioSesion.email.split('@')[0];
+            }
+
+            abrirModal('modal-comentarios');
+            await cargarComentariosDelLibro(libroId);
+        }
+
+        async function cargarComentariosDelLibro(libroId) {
+            const listaEl = document.getElementById('lista-comentarios');
+            listaEl.innerHTML = "<p style='text-align:center; color:#888;'>Cargando comentarios...</p>";
+
+            const { data: comentarios, error } = await supabaseClient
+                .from('comentarios')
+                .select('*')
+                .eq('libro_id', libroId)
+                .order('created_at', { ascending: false });
+
+            if (error || !comentarios || comentarios.length === 0) {
+                listaEl.innerHTML = "<p style='text-align:center; color:#888;'>Aún no hay comentarios. ¡Sé el primero en comentar!</p>";
+                return;
+            }
+
+            listaEl.innerHTML = "";
+            comentarios.forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'comentario-item';
+                item.innerHTML = `
+                    <strong>${c.nombre || 'Lector'}</strong>
+                    <p>${c.texto}</p>
+                `;
+                listaEl.appendChild(item);
+            });
+        }
+
+        async function guardarComentario(e) {
+            e.preventDefault();
+            if (!libroActualComentarios) return;
+
+            const nombreInput = document.getElementById('input-nombre');
+            const textoInput = document.getElementById('input-texto');
+
+            const nombre = nombreInput.value.trim();
+            const texto = textoInput.value.trim();
+
+            if (!nombre || !texto) return;
+
+            const { error } = await supabaseClient
+                .from('comentarios')
+                .insert([{ libro_id: libroActualComentarios, nombre: nombre, texto: texto }]);
+
+            if (error) {
+                alert("Error al enviar comentario: " + error.message);
+                return;
+            }
+
+            textoInput.value = "";
+            await cargarComentariosDelLibro(libroActualComentarios);
+
+            const countSpan = document.getElementById(`count-${libroActualComentarios}`);
+            if (countSpan) {
+                countSpan.innerText = parseInt(countSpan.innerText || '0') + 1;
+            }
+        }
+
+        async function iniciarPago(idLibro) {
+            // Si no hay sesión activa de usuario, abrimos el modal de login
+            if (!usuarioSesion) {
+                alert("Para adquirir una licencia digital y asociarla a tu biblioteca, por favor iniciá sesión o registrate.");
+                abrirModal('modal-login');
+                return;
+            }
+
+            const btn = document.getElementById(`btn-${idLibro}`);
+            btn.disabled = true;
+            btn.innerText = "Procesando...";
+
+            try {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/crear-preferencia`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ libro_id: idLibro, user_id: usuarioSesion.id })
+                });
+
+                const data = await response.json();
+
+                if (data.init_point) {
+                    window.location.href = data.init_point; 
+                } else {
+                    alert("Error al iniciar el pago: " + (data.error || "Intente más tarde."));
+                    btn.disabled = false;
+                    btn.innerText = "Adquirir Licencia Digital";
+                }
+            } catch (e) {
+                alert("Error de conexión con el servidor de pagos");
+                btn.disabled = false;
+                btn.innerText = "Adquirir Licencia Digital";
+            }
+        }
+
+        async function inicializarPagina() {
+            await revisarSesion();
+            await cargarDatosAutor();
+            await cargarCatalogo();
+        }
+
+        function enviarMensajeSoporte(e) {
+            e.preventDefault();
+
+            if (!mailAutor) {
+                alert("El servicio de contacto no está disponible en este momento.");
+                return;
+            }
+
+            const asunto = document.getElementById('soporte-asunto').value.trim();
+            const mensaje = document.getElementById('soporte-mensaje').value.trim();
+
+            if (!asunto || !mensaje) return;
+
+            // Abrir el cliente de correo del usuario precompletando destinatario, asunto y cuerpo
+            const mailtoUrl = `mailto:${mailAutor}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(mensaje)}`;
+            window.location.href = mailtoUrl;
+
+            // Limpiar y cerrar modal
+            document.getElementById('soporte-asunto').value = '';
+            document.getElementById('soporte-mensaje').value = '';
+            cerrarModal('modal-soporte');
+        }
+
+        inicializarPagina();
+    </script>
 </body>
 </html>
