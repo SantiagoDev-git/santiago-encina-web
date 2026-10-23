@@ -6,462 +6,8 @@
     <title>Santiago Encina - Portal del Lector</title>
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            max-width: 1000px; 
-            margin: 0 auto; 
-            padding: 15px 20px 40px 20px; 
-            color: #2b2b2b; 
-            background: #faf8f5; 
-        }
-
-        /* BARRA SUPERIOR DE NAVEGACIÓN (NAVBAR) */
-        .navbar {
-            background: #ffffff;
-            padding: 12px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #1a1a1a;
-        }
-        .navbar-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .btn-nav {
-            background: transparent;
-            border: 1px solid #009ee3;
-            color: #009ee3;
-            padding: 7px 14px;
-            border-radius: 6px;
-            font-size: 0.88em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-nav:hover {
-            background: #009ee3;
-            color: white;
-        }
-        .btn-nav-primary {
-            background: #009ee3;
-            color: white;
-        }
-        .btn-nav-primary:hover {
-            background: #0081b8;
-        }
-        .user-email {
-            font-size: 0.88em;
-            color: #2e7d32;
-            font-weight: 600;
-        }
-
-        /* Banner del Autor */
-        .autor-header {
-            position: relative;
-            background-size: cover;
-            background-position: center;
-            border-radius: 14px;
-            padding: 30px;
-            color: #ffffff;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .autor-header-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.65);
-            z-index: 1;
-        }
-
-        .autor-titulo-centrado {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            width: 100%;
-            margin: 0;
-            font-size: 2.2em;
-            letter-spacing: 0.5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-        }
-
-        .autor-contenido {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            gap: 25px;
-        }
-
-        .autor-foto {
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #ffffff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            flex-shrink: 0;
-        }
-
-        .autor-info {
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-        }
-
-        .autor-info h2 {
-            margin: 0 0 8px 0;
-            font-size: 1.05em;
-            font-weight: 600;
-            color: #f1c40f;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .autor-info p {
-            margin: 0;
-            font-size: 0.95em;
-            line-height: 1.55;
-            color: #f0f0f0;
-            text-align: justify;
-        }
-
-        /* Marquesina */
-        .marquesina-container {
-            background: #1a1a1a;
-            color: #f1c40f;
-            padding: 10px 0;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95em;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-
-        .mensaje-alerta {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            text-align: center;
-            font-weight: 500;
-            display: none;
-        }
-        .exito { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-
-        /* Catálogo de Libros */
-        .catalogo-container {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-        
-        .card-libro { 
-            background: #ffffff; 
-            padding: 25px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 18px rgba(0,0,0,0.05); 
-            display: flex;
-            flex-direction: row;
-            gap: 25px;
-            align-items: flex-start;
-            height: 480px; 
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .card-libro:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(0,0,0,0.08);
-        }
-        
-        .portada-container {
-            flex-shrink: 0;
-            width: 210px;
-            text-align: center;
-        }
-        .portada {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-        }
-
-        .info-container {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .titulo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 4px;
-        }
-        
-        .info-container h3 {
-            font-size: 1.5em;
-            color: #1a1a1a;
-            margin: 0;
-            flex-shrink: 0;
-        }
-
-        .badge-img {
-            height: 28px;
-            width: auto;
-            object-fit: contain;
-            vertical-align: middle;
-        }
-
-        .meta-info {
-            font-size: 0.88em;
-            color: #777;
-            margin-bottom: 12px;
-            flex-shrink: 0;
-        }
-        .meta-info span {
-            color: #444;
-            font-weight: 500;
-        }
-
-        .sinopsis-scroll {
-            color: #4a4a4a; 
-            font-size: 0.95em; 
-            line-height: 1.6; 
-            text-align: justify;
-            padding-right: 12px;
-            margin-bottom: 10px;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-
-        .sinopsis-scroll::-webkit-scrollbar { width: 6px; }
-        .sinopsis-scroll::-webkit-scrollbar-thumb { background-color: #d1cabe; border-radius: 4px; }
-        .sinopsis-scroll::-webkit-scrollbar-track { background: #f5f2eb; }
-
-        .comprar-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-top: 1px solid #f0ebe1;
-            padding-top: 10px;
-            margin-top: auto;
-            gap: 15px;
-            flex-shrink: 0;
-            background: #ffffff;
-        }
-
-        .precio-comentarios-box {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .precio {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #2e7d32;
-        }
-
-        .btn-comentarios {
-            background: #f0ebe1;
-            color: #4a4a4a;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: background 0.2s, color 0.2s;
-        }
-        .btn-comentarios:hover {
-            background: #e2dacd;
-            color: #1a1a1a;
-        }
-        
-        .btn-comprar { 
-            background: #009ee3; 
-            color: white; 
-            padding: 10px 24px; 
-            border: none;
-            border-radius: 6px; 
-            font-weight: bold; 
-            cursor: pointer;
-            font-size: 1em;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-        .btn-comprar:hover { background: #0081b8; }
-        .btn-comprar:disabled { background: #ccc; cursor: not-allowed; }
-
-        .tiendas-externas-box {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            padding-top: 8px;
-            margin-top: 6px;
-            border-top: 1px dashed #e8e3d8;
-            flex-shrink: 0;
-        }
-
-        .tienda-fila {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.85em;
-            color: #555;
-            background: #fcfbf9;
-            padding: 6px 10px;
-            border-radius: 6px;
-        }
-
-        .tienda-link {
-            color: #00732e;
-            font-weight: 600;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .tienda-link:hover { text-decoration: underline; }
-
-        .formatos-pills { display: flex; gap: 5px; }
-
-        .pill-formato {
-            background: #eef2f5;
-            color: #334e68;
-            font-size: 0.78em;
-            padding: 2px 7px;
-            border-radius: 4px;
-            font-weight: 500;
-            border: 1px solid #d9e2ec;
-        }
-
-        /* MODALES GENERIClOS */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-
-        .modal-box {
-            background: #ffffff;
-            width: 100%;
-            max-width: 480px;
-            border-radius: 12px;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-            animation: slideUp 0.3s ease-out;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 12px;
-            margin-bottom: 15px;
-        }
-        .modal-header h3 { margin: 0; font-size: 1.25em; color: #1a1a1a; }
-        .btn-cerrar {
-            background: none;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-            color: #888;
-        }
-        .btn-cerrar:hover { color: #000; }
-
-        .form-auth {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .form-auth input {
-            padding: 11px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 0.95em;
-        }
-        .btn-submit-auth {
-            background: #009ee3;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1em;
-            margin-top: 5px;
-        }
-        .btn-submit-auth:hover { background: #0081b8; }
-
-        /* Lista Comentarios Modal */
-        .lista-comentarios {
-            overflow-y: auto;
-            max-height: 250px;
-            margin-bottom: 15px;
-            padding-right: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .comentario-item {
-            background: #f9f8f6;
-            padding: 12px 15px;
-            border-radius: 8px;
-            border-left: 3px solid #009ee3;
-        }
-        .comentario-item strong { color: #1a1a1a; font-size: 0.95em; }
-        .comentario-item p { margin: 5px 0 0 0; color: #444; font-size: 0.92em; line-height: 1.4; }
-
-        @media (max-width: 650px) {
-            .navbar { flex-direction: column; gap: 10px; text-align: center; }
-            .autor-contenido { flex-direction: column; text-align: center; }
-            .autor-info p { text-align: center; }
-            .card-libro { flex-direction: column; height: auto; align-items: center; padding: 20px; }
-            .portada-container { width: 170px; margin-bottom: 10px; }
-            .info-container { height: auto; width: 100%; }
-            .sinopsis-scroll { max-height: 200px; }
-            .comprar-row { flex-direction: column; align-items: stretch; text-align: center; gap: 12px; }
-            .precio-comentarios-box { justify-content: space-between; }
-            .btn-comprar { width: 100%; }
-            .tienda-fila { flex-direction: column; gap: 4px; text-align: center; }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    
 </head>
 <body>
 
@@ -502,48 +48,169 @@
 
     <!-- MODAL: REGISTRO -->
     <div id="modal-registro" class="modal-overlay">
-        <div class="modal-box">
+        <div class="modal-box" style="max-width: 480px;">
             <div class="modal-header">
                 <h3>Crear Cuenta de Lector</h3>
                 <button class="btn-cerrar" onclick="cerrarModal('modal-registro')">&times;</button>
             </div>
+            
+            <p style="font-size: 0.9em; color: #555; margin-bottom: 16px; text-align: left;">
+                Completá tus datos para acceder a tu biblioteca digital y disfrutar de tus lecturas.
+            </p>
+
             <form class="form-auth" onsubmit="ejecutarRegistro(event)">
-                <input type="email" id="reg-email" placeholder="Correo electrónico" required>
-                <input type="password" id="reg-password" placeholder="Contraseña (mínimo 6 caracteres)" minlength="6" required>
-                <button type="submit" class="btn-submit-auth">Registrarme</button>
+                
+                <!-- Campo 1: Correo -->
+                <div class="campo-grupo">
+                    <label for="reg-email">
+                        📧 <strong>Dirección de correo electrónico:</strong>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="reg-email" 
+                        placeholder="Ejemplo: tunombre@proveedor.com" 
+                        required
+                    />
+                    <small class="texto-ayuda">
+                        Escribí acá tu e-mail habitual (por ejemplo: <i>tunombre@gmail.com</i>). A esta dirección te enviaremos la confirmación y tus libros.
+                    </small>
+                </div>
+
+                <!-- Campo 2: Contraseña -->
+                <div class="campo-grupo">
+                    <label for="reg-password">
+                        🔒 <strong>Contraseña secreta:</strong>
+                    </label>
+                    <input 
+                        type="password" 
+                        id="reg-password" 
+                        placeholder="Escribí tu clave aquí..." 
+                        minlength="6" 
+                        required
+                    />
+                    <small class="texto-ayuda">
+                        Acá va tu contraseña. Podés usar letras, números y signos (mínimo 6 caracteres). <strong>Guardala en un lugar seguro y no la compartas con nadie.</strong>
+                    </small>
+                </div>
+
+                <!-- Botón de Envío -->
+                <button type="submit" class="btn-submit-auth" style="margin-top: 10px;">
+                    ✨ Crear mi cuenta y comenzar
+                </button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: LOGIN -->
+    
+    <!-- MODAL: LOGIN ENRIQUECIDO -->
     <div id="modal-login" class="modal-overlay">
-        <div class="modal-box">
+        <div class="modal-box" style="max-width: 480px;">
             <div class="modal-header">
-                <h3>Iniciar Sesión</h3>
+                <h3>Ingresar a mi Biblioteca</h3>
                 <button class="btn-cerrar" onclick="cerrarModal('modal-login')">&times;</button>
             </div>
+
+            <p style="font-size: 0.9em; color: #555; margin-bottom: 16px; text-align: left;">
+                Ingresá con los mismos datos que registraste para ver y leer tus obras.
+            </p>
+
             <form class="form-auth" onsubmit="ejecutarLogin(event)">
-                <input type="email" id="login-email" placeholder="Correo electrónico" required>
-                <input type="password" id="login-password" placeholder="Contraseña" required>
-                <button type="submit" class="btn-submit-auth">Ingresar</button>
+                
+                <!-- Campo 1: Correo -->
+                <div class="campo-grupo">
+                    <label for="login-email">
+                        📧 <strong>Tu correo de lector:</strong>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="login-email" 
+                        placeholder="Ejemplo: tunombre@proveedor.com" 
+                        required
+                    />
+                    <small class="texto-ayuda">
+                        El e-mail con el que te registraste (por ejemplo: <i>tunombre@gmail.com</i>).
+                    </small>
+                </div>
+
+                <!-- Campo 2: Contraseña -->
+                <div class="campo-grupo">
+                    <label for="login-password">
+                        🔑 <strong>Tu contraseña:</strong>
+                    </label>
+                    <input 
+                        type="password" 
+                        id="login-password" 
+                        placeholder="Escribí tu contraseña..." 
+                        required
+                    />
+                    <small class="texto-ayuda">
+                        La clave que creaste al momento de abrir tu cuenta.
+                    </small>
+                </div>
+
+                <!-- Botón de Envío -->
+                <button type="submit" class="btn-submit-auth" style="margin-top: 10px;">
+                    🔓 Iniciar Sesión y Leer
+                </button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: SOPORTE / CONTACTO -->
+    <!-- MODAL: SOPORTE Y CONTACTO ENRIQUECIDO -->
     <div id="modal-soporte" class="modal-overlay">
-        <div class="modal-box">
+        <div class="modal-box" style="max-width: 480px;">
             <div class="modal-header">
                 <h3>Contacto y Soporte</h3>
                 <button class="btn-cerrar" onclick="cerrarModal('modal-soporte')">&times;</button>
             </div>
-            <p style="font-size:0.9em; color:#555; margin-bottom:12px;">
-                ¿Tenés alguna consulta o comentario? Escribinos a continuación y te responderemos a la brevedad.
+
+            <p style="font-size: 0.9em; color: #555; margin-bottom: 16px; text-align: left;">
+                ¿Tenés alguna duda, consulta o inconveniente técnico? Escribinos y te responderemos a la brevedad.
             </p>
+
             <form class="form-auth" onsubmit="enviarMensajeSoporte(event)">
-                <input type="text" id="soporte-asunto" placeholder="Asunto de la consulta" required>
-                <textarea id="soporte-mensaje" placeholder="Escribí tu mensaje aquí..." style="padding:10px; border:1px solid #ccc; border-radius:6px; resize:none; height:100px;" required></textarea>
-                <button type="submit" class="btn-submit-auth" style="background:#009ee3;">Enviar Mensaje</button>
+                
+                <!-- Campo 1: Asunto -->
+                <div class="campo-grupo">
+                    <label for="soporte-asunto">
+                        📌 <strong>Asunto o motivo de tu consulta:</strong>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="soporte-asunto" 
+                        placeholder="Ejemplo: Consulta sobre mi compra / Cambio de dispositivo" 
+                        required
+                    />
+                    <small class="texto-ayuda">
+                        Escribí en pocas palabras sobre qué querés consultarnos.
+                    </small>
+                </div>
+
+                <!-- Campo 2: Mensaje -->
+                <div class="campo-grupo">
+                    <label for="soporte-mensaje">
+                        ✍️ <strong>Tu mensaje o explicación:</strong>
+                    </label>
+                    <textarea 
+                        id="soporte-mensaje" 
+                        placeholder="Escribí tu mensaje detallado aquí..." 
+                        style="width: 100%; padding: 11px 13px; border: 1px solid #ccc; border-radius: 6px; resize: none; height: 110px; font-family: inherit; font-size: 0.95em;" 
+                        required
+                    ></textarea>
+                    <small class="texto-ayuda">
+                        Contanos con detalle en qué podemos ayudarte.
+                    </small>
+                </div>
+
+                <!-- Aclaración humana -->
+                <p style="font-size: 0.85em; color: #78350f; background: #fef3c7; border: 1px dashed #d97706; padding: 10px 12px; border-radius: 8px; margin: 4px 0 12px 0; text-align: left; line-height: 1.4;">
+                    👤 <strong>Atención personal:</strong> Todos los mensajes son leídos y respondidos personalmente (sin bots ni respuestas automáticas). Agradecemos tu paciencia.
+                </p>
+
+                <!-- Botón de Envío -->
+                <button type="submit" class="btn-submit-auth">
+                    📩 Enviar Mensaje
+                </button>
             </form>
         </div>
     </div>
@@ -566,393 +233,276 @@
         </div>
     </div>
 
-    <script>
-        const SUPABASE_URL = "https://kpltcxhnqhgzgxazhgbv.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_rdFjhKYduJglnoq-D0jHOw_7ik0VaFG"; 
+    <!-- Notificación Flotante de Confirmación -->
+    <div id="comentario-toast" style="display: none; position: fixed; bottom: 24px; right: 24px; background-color: #1c1917; color: #fef3c7; border: 1px solid #d97706; padding: 14px 20px; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); z-index: 99999; font-family: sans-serif;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 20px;">✨</span>
+            <div>
+                <p style="font-weight: bold; margin: 0; font-size: 14px; color: #ffffff;">¡Gracias por su comentario!</p>
+                <p style="margin: 2px 0 0 0; font-size: 12px; color: #a8a29e;">Estado: <span style="color: #fbbf24; font-weight: 600;">En revisión</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: BLOQUEO DE DISPOSITIVO -->
+    <div id="modal-bloqueo-dispositivo" class="modal-overlay">
+        <div class="modal-box" style="max-width: 480px; text-align: center;">
+            <div style="font-size: 32px; margin-bottom: 12px;">📱🔒</div>
+            <h3 style="margin: 0 0 12px 0; font-size: 18px; font-weight: bold; color: #1a1a1a;">Dispositivo no registrado</h3>
+            <p style="font-size: 13px; line-height: 1.6; color: #555; margin-bottom: 16px;">
+                Esta obra y tu cuenta de lector ya se encuentran vinculadas a otro dispositivo de lectura.
+            </p>
+            <p style="font-size: 12px; line-height: 1.5; color: #b45309; background: #fef3c7; border: 1px dashed #d97706; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+                ℹ️ <strong>¿Cambiaste de teléfono o tablet?</strong><br>
+                Contactate con Soporte para desvincular tu equipo anterior. Por favor tené a mano tu <strong>ticket o comprobante de compra de Mercado Pago</strong> para verificar la titularidad.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="cerrarModalDispositivo()" style="flex: 1; padding: 10px; background: #374151; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Entendido</button>
+                <button onclick="irASoporteDesdeBloqueo()" style="flex: 1; padding: 10px; background: #009ee3; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">💬 Contactar Soporte</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN INSTRUCTIVO (CÓMO COMPRAR Y LEER) -->
+    <section class="instructivo-container" id="como-leer">
+        <div class="instructivo-inner">
+            <span class="instructivo-subtitle">Guía simple para el lector</span>
+            <h2 class="instructivo-title">¿Cómo adquirir tu obra y comenzar a leer?</h2>
+
+            <div class="pasos-wrapper">
+                <!-- PASO 1 -->
+                <div class="paso-card paso-1">
+                    <div class="paso-badge">
+                        <span>PASO 1</span>
+                    </div>
+                    <div class="paso-contenido">
+                        <div class="paso-header">
+                            <h3>Creá tu cuenta de lector</h3>
+                            <span class="paso-icono">👤</span>
+                        </div>
+                        <p>Hacé clic en el botón azul <strong>"Registrarse"</strong> arriba a la derecha. Solo necesitás ingresar tu correo electrónico y crear una contraseña. Es totalmente seguro y rápido.</p>
+                    </div>
+                </div>
+
+                <!-- PASO 2 -->
+                <div class="paso-card paso-2">
+                    <div class="paso-badge">
+                        <span>PASO 2</span>
+                    </div>
+                    <div class="paso-contenido">
+                        <div class="paso-header">
+                            <h3>Elegí el libro que querés disfrutar</h3>
+                            <span class="paso-icono">📚</span>
+                        </div>
+                        <p>Explorá nuestro catálogo, leé las sinopsis de las obras y tocá el botón azul que dice <strong>"Adquirir Licencia Digital"</strong> en el libro que te interese.</p>
+                    </div>
+                </div>
+
+                <!-- PASO 3 -->
+                <div class="paso-card paso-3">
+                    <div class="paso-badge">
+                        <span>PASO 3</span>
+                    </div>
+                    <div class="paso-contenido">
+                        <div class="paso-header">
+                            <h3>Aboná de forma segura</h3>
+                            <span class="paso-icono">💳</span>
+                        </div>
+                        <p>El sistema te llevará a <strong>Mercado Pago</strong>. Podés pagar con tarjeta de débito, crédito o dinero en cuenta. Una vez que confirmes el pago, regresarás automáticamente a la página.</p>
+                    </div>
+                </div>
+
+                <!-- PASO 4 -->
+                <div class="paso-card paso-4">
+                    <div class="paso-badge">
+                        <span>PASO 4</span>
+                    </div>
+                    <div class="paso-contenido">
+                        <div class="paso-header">
+                            <h3>¡Comenzá a leer al instante!</h3>
+                            <span class="paso-icono">📖</span>
+                        </div>
+                        <p>El botón del libro se transformará en <strong>"📖 Continuar Leyendo"</strong>. Hacé clic para abrir el lector interactivo y disfrutar de tu lectura directo desde tu teléfono, tablet o computadora.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN PREGUNTAS FRECUENTES (FAQs) -->
+    <section class="faq-container" id="faqs-seccion">
+        <div class="faq-inner">
+            <span class="faq-subtitle">FAQs</span>
+            <h2 class="faq-title">Preguntas frecuentes</h2>
+
+            <div class="faq-grid">
+                <!-- Columna Izquierda -->
+                <div class="faq-column">
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>¿Cómo compro un libro y comienzo a leer?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Creá tu cuenta de lector o iniciá sesión, seleccioná la obra que desees en el catálogo y hacé clic en "Adquirir Licencia Digital". Al completarse el pago seguro por Mercado Pago, se habilitará el botón "Continuar Leyendo" de forma instantánea.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>¿En cuántos dispositivos puedo leer mi e-book?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Por motivos de protección de derechos de autor y seguridad, cada licencia digital está vinculada a 1 dispositivo de lectura activo a la vez (tu teléfono, tablet o computadora principal).</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>¿Qué pasa si cambio de teléfono o computadora?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>¡No te preocupes! Si cambiaste de equipo, contactate con Soporte desde la web y tené a mano tu comprobante o ticket de Mercado Pago. Te ayudaremos a desvincular el equipo anterior para asociar el nuevo de inmediato.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>¿Necesito descargar alguna aplicación adicional?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>No. Nuestra plataforma funciona 100% en el navegador web de tu dispositivo. Podés leer sin ocupar memoria ni instalar nada externo.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>¿Qué medios de pago puedo utilizar?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Aceptamos todos los medios de pago procesados por Mercado Pago: tarjetas de crédito, débito, dinero en cuenta de Mercado Pago y efectivo en puntos de pago autorizados.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha -->
+                <div class="faq-column">
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>¿Tengo acceso ilimitado en el tiempo a mis obras?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Sí. Una vez adquirida la licencia digital, el acceso al libro es vitalicio y estará siempre disponible en tu cuenta de usuario.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>¿Mis datos personales o bancarios quedan guardados?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>No. Mantenemos una política estricta de privacidad. Solo almacenamos tu correo de registro. Toda transacción financiera es gestionada y encriptada directamente por Mercado Pago.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>¿Puedo leer las obras sin conexión a Internet?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Se requiere una conexión activa a Internet para validar tu licencia y cargar el lector interactivo de forma fluida y segura.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>¿Puedo dejar comentarios o reseñas en los libros?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>¡Sí! Nos encanta conocer la opinión de los lectores. Podés hacer clic en el botón de comentarios en cada obra. Tu reseña pasará por una breve moderación y luego será visible para todos.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>¿Cómo me contacto si tengo algún problema técnico?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Podés hacer clic en el botón "Soporte" ubicado en la barra superior o en el pie de página para enviarnos tu consulta directa. Te responderemos a la brevedad.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+        <!-- PIE DE PÁGINA (FOOTER) -->
+        <footer class="footer-container">
+            <div class="footer-content">
+                <!-- Columna 1: Legales -->
+                <div class="footer-col">
+                    <a href="legal.html#privacidad">Política de Privacidad</a>
+                    <a href="legal.html#terminos">Términos de Servicio</a>
+                </div>
+
+                <!-- Columna 2: Ayuda e Instructivo -->
+                <div class="footer-col">
+                    <a href="#como-leer">Cómo comprar y leer</a>
+                    <a href="legal.html#devoluciones">Políticas de Devolución</a>
+                </div>
+
+                <!-- Columna 3: Información -->
+                <div class="footer-col">
+                    <a href="#faqs-seccion">Preguntas Frecuentes (FAQ)</a>
+                    <a href="legal.html#tratamiento-datos">Tratamiento de Datos</a>
+                </div>
+
+                <!-- Columna 4: Contacto -->
+                <div class="footer-col">
+                    <a href="#" onclick="abrirModal('modal-soporte'); return false;">Contacto y Soporte</a>
+                </div>
+
+                <!-- Columna 5: Reserva de Derecho y Uso Aceptable -->
+                <div class="footer-col">
+                    <a href="legal.html#clausula-abuso">Reserva de Derecho y Uso Aceptable</a>
+                </div>
+            </div>
+
+            <!-- Fila de Redes Sociales y Comunidades -->
+            <div class="footer-social">
+                <!-- Facebook destacado -->
+                <a href="https://www.facebook.com/profile.php?id=61595293444428" target="_blank" title="Página de Facebook" style="width: auto; padding: 0 14px; font-size: 0.88em; display: inline-flex; align-items: center; gap: 6px;">
+                    <b>f</b> Facebook
+                </a>
+                
+                <!-- Telegram destacado -->
+                <a href="https://t.me/autor_santiago_encina" target="_blank" title="Comunidad en Telegram" style="width: auto; padding: 0 14px; font-size: 0.88em; display: inline-flex; align-items: center; gap: 6px;">
+                    ✈️ Comunidad Telegram
+                </a>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <!-- Copyright -->
+            <div class="footer-copyright">
+                © 2026 Santiago Encina | Plataforma de Lectura Segura
+            </div>
+        </footer>
         
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const libroFiltro = urlParams.get('libro'); 
-        let userId = urlParams.get('user') || 'anonimo';
-        const estadoPago = urlParams.get('estado');
 
-        let imgNuevoUrl = "";
-        let imgOfertaUrl = "";
-        let libroActualComentarios = null;
-        let usuarioSesion = null;
-        let mailAutor = "";
+    <script src="app.js"></script>
+    </body>
 
-        // Mostrar estado del pago
-        const alertaEl = document.getElementById('alerta-pago');
-        if (estadoPago === 'exito') {
-            alertaEl.className = "mensaje-alerta exito";
-            alertaEl.innerText = "¡Pago procesado con éxito! Ya podés disfrutar de tu lectura.";
-            alertaEl.style.display = "block";
-        } else if (estadoPago === 'error') {
-            alertaEl.className = "mensaje-alerta error";
-            alertaEl.innerText = "Hubo un problema con el pago. Por favor intentá nuevamente.";
-            alertaEl.style.display = "block";
-        }
 
-        // VERIFICAR AUTENTICACIÓN / SESIÓN ACTIVA
-        async function revisarSesion() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            const navActions = document.getElementById('nav-actions');
-
-            if (session && session.user) {
-                usuarioSesion = session.user;
-                userId = session.user.id; // Actualizamos el ID real del usuario
-                navActions.innerHTML = `
-                    <span class="user-email">👤 ${session.user.email}</span>
-                    <button class="btn-nav" onclick="abrirModal('modal-soporte')">Soporte</button>
-                    <button class="btn-nav" onclick="cerrarSesion()">Cerrar Sesión</button>
-                `;
-            } else {
-                usuarioSesion = null;
-                navActions.innerHTML = `
-                    <button class="btn-nav" onclick="abrirModal('modal-soporte')">Soporte</button>
-                    <button class="btn-nav" onclick="abrirModal('modal-login')">Iniciar Sesión</button>
-                    <button class="btn-nav btn-nav-primary" onclick="abrirModal('modal-registro')">Registrarse</button>
-                `;
-            }
-        }
-
-        // FUNCIONES DE AUTH
-        async function ejecutarRegistro(e) {
-            e.preventDefault();
-            const email = document.getElementById('reg-email').value;
-            const password = document.getElementById('reg-password').value;
-
-            const { data, error } = await supabaseClient.auth.signUp({ email, password });
-
-            if (error) {
-                alert("Error al registrarse: " + error.message);
-            } else {
-                alert("¡Cuenta creada exitosamente! Ya podés iniciar sesión.");
-                cerrarModal('modal-registro');
-                revisarSesion();
-            }
-        }
-
-        async function ejecutarLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-            if (error) {
-                alert("Error de inicio de sesión: " + error.message);
-            } else {
-                cerrarModal('modal-login');
-                revisarSesion();
-            }
-        }
-
-        async function cerrarSesion() {
-            await supabaseClient.auth.signOut();
-            revisarSesion();
-        }
-
-        // FUNCIONES MODALES
-        function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        // DATOS AUTOR
-        async function cargarDatosAutor() {
-            try {
-                const { data: autor, error } = await supabaseClient
-                    .from('autor')
-                    .select('*')
-                    .eq('id', 1)
-                    .single();
-
-                if (error || !autor) return;
-
-                imgNuevoUrl = autor.img_nuevo_url || "";
-                imgOfertaUrl = autor.img_oferta_url || "";
-                mailAutor = autor.mail || "";
-
-                const headerEl = document.getElementById('seccion-autor');
-                if (autor.img_fondo_url) {
-                    headerEl.style.backgroundImage = `url('${autor.img_fondo_url}')`;
-                }
-                document.getElementById('autor-foto').src = autor.img_foto_url || '';
-                document.getElementById('autor-biografia').innerText = autor.biografia || '';
-                headerEl.style.display = 'flex';
-
-                if (autor.mensage) {
-                    document.getElementById('autor-mensaje').innerText = autor.mensage;
-                    document.getElementById('seccion-marquesina').style.display = 'block';
-                }
-            } catch (err) {
-                console.error("Error al cargar autor:", err);
-            }
-        }
-
-        // CATÁLOGO
-        async function cargarCatalogo() {
-            const contenedor = document.getElementById('contenedor-catalogo');
-
-            try {
-                let query = supabaseClient.from('libros').select('*');
-
-                if (libroFiltro) {
-                    query = query.eq('id', libroFiltro);
-                }
-
-                const { data: libros, error } = await query;
-
-                if (error || !libros || libros.length === 0) {
-                    contenedor.innerHTML = "<p style='text-align:center;'>No hay libros disponibles en este momento.</p>";
-                    return;
-                }
-
-                contenedor.innerHTML = "";
-
-                for (const libro of libros) {
-                    const { count } = await supabaseClient
-                        .from('comentarios')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('libro_id', libro.id);
-
-                    const totalComentarios = count || 0;
-
-                    let badgesHtml = '';
-                    if (libro.es_nuevo && imgNuevoUrl) {
-                        badgesHtml += `<img src="${imgNuevoUrl}" alt="Novedad" class="badge-img"> `;
-                    }
-                    if (libro.es_oferta && imgOfertaUrl) {
-                        badgesHtml += `<img src="${imgOfertaUrl}" alt="Oferta" class="badge-img">`;
-                    }
-
-                    const precioMostrado = libro.precio ? libro.precio : (libro.precio_ars ? libro.precio_ars : '0');
-                    const palabrasInfo = libro.cant_palabras ? ` | 📖 ${Number(libro.cant_palabras).toLocaleString('es-AR')} palabras` : '';
-
-                    let filaAmazonHtml = '';
-                    if (libro.amz_activo) {
-                        let formatosAmz = '';
-                        if (libro.amz_ebook) formatosAmz += `<span class="pill-formato">e-Book</span> `;
-                        if (libro.amz_blanda) formatosAmz += `<span class="pill-formato">Tapa Blanda</span> `;
-                        if (libro.amz_dura) formatosAmz += `<span class="pill-formato">Tapa Dura</span>`;
-
-                        filaAmazonHtml = `
-                            <div class="tienda-fila">
-                                <a href="${libro.amz_url || '#'}" target="_blank" class="tienda-link">
-                                    🛒 También disponible en Amazon ↗
-                                </a>
-                                <div class="formatos-pills">${formatosAmz}</div>
-                            </div>
-                        `;
-                    }
-
-                    let filaPublicaHtml = '';
-                    if (libro.pub_activo) {
-                        let formatosPub = '';
-                        if (libro.pub_ebook) formatosPub += `<span class="pill-formato">e-Book</span> `;
-                        if (libro.pub_blanda) formatosPub += `<span class="pill-formato">Tapa Blanda</span> `;
-                        if (libro.pub_dura) formatosPub += `<span class="pill-formato">Tapa Dura</span>`;
-
-                        filaPublicaHtml = `
-                            <div class="tienda-fila">
-                                <a href="${libro.pub_url || '#'}" target="_blank" class="tienda-link">
-                                    📖 Disponible en Publica.now ↗
-                                </a>
-                                <div class="formatos-pills">${formatosPub}</div>
-                            </div>
-                        `;
-                    }
-
-                    let cajaTiendasHtml = '';
-                    if (filaAmazonHtml || filaPublicaHtml) {
-                        cajaTiendasHtml = `
-                            <div class="tiendas-externas-box">
-                                ${filaAmazonHtml}
-                                ${filaPublicaHtml}
-                            </div>
-                        `;
-                    }
-
-                    const tarjeta = document.createElement('div');
-                    tarjeta.className = 'card-libro';
-                    tarjeta.innerHTML = `
-                        <div class="portada-container">
-                            <img src="${libro.portada_url || ''}" alt="Portada de ${libro.titulo}" class="portada">
-                        </div>
-                        <div class="info-container">
-                            <div>
-                                <div class="titulo-container">
-                                    <h3>${libro.titulo}</h3>
-                                    ${badgesHtml}
-                                </div>
-                                <div class="meta-info">
-                                    ${libro.autor ? `Por <span>${libro.autor}</span>` : ''} 
-                                    ${libro.genero ? `| Género: <span>${libro.genero}</span>` : ''}
-                                    ${palabrasInfo}
-                                </div>
-                            </div>
-                            <div class="sinopsis-scroll">
-                                ${libro.sinopsis || 'Sin descripción disponible.'}
-                            </div>
-                            <div class="comprar-row">
-                                <div class="precio-comentarios-box">
-                                    <div class="precio">$ ${precioMostrado} ARS</div>
-                                    <button class="btn-comentarios" onclick="abrirComentarios('${libro.id}', '${libro.titulo}')">
-                                        💬 <span id="count-${libro.id}">${totalComentarios}</span>
-                                    </button>
-                                </div>
-                                <button class="btn-comprar" id="btn-${libro.id}" onclick="iniciarPago('${libro.id}')">
-                                    Adquirir Licencia Digital
-                                </button>
-                            </div>
-                            ${cajaTiendasHtml}
-                        </div>
-                    `;
-                    contenedor.appendChild(tarjeta);
-                }
-
-            } catch (err) {
-                console.error("Excepción:", err);
-                contenedor.innerHTML = `<p style="color: red; text-align:center;">Ocurrió un error al cargar el catálogo.</p>`;
-            }
-        }
-
-        async function abrirComentarios(libroId, titulo) {
-            libroActualComentarios = libroId;
-            document.getElementById('modal-titulo-libro').innerText = `Comentarios: ${titulo}`;
-            
-            // Si el usuario está logueado, precompletar su nombre
-            if (usuarioSesion) {
-                document.getElementById('input-nombre').value = usuarioSesion.email.split('@')[0];
-            }
-
-            abrirModal('modal-comentarios');
-            await cargarComentariosDelLibro(libroId);
-        }
-
-        async function cargarComentariosDelLibro(libroId) {
-            const listaEl = document.getElementById('lista-comentarios');
-            listaEl.innerHTML = "<p style='text-align:center; color:#888;'>Cargando comentarios...</p>";
-
-            const { data: comentarios, error } = await supabaseClient
-                .from('comentarios')
-                .select('*')
-                .eq('libro_id', libroId)
-                .order('created_at', { ascending: false });
-
-            if (error || !comentarios || comentarios.length === 0) {
-                listaEl.innerHTML = "<p style='text-align:center; color:#888;'>Aún no hay comentarios. ¡Sé el primero en comentar!</p>";
-                return;
-            }
-
-            listaEl.innerHTML = "";
-            comentarios.forEach(c => {
-                const item = document.createElement('div');
-                item.className = 'comentario-item';
-                item.innerHTML = `
-                    <strong>${c.nombre || 'Lector'}</strong>
-                    <p>${c.texto}</p>
-                `;
-                listaEl.appendChild(item);
-            });
-        }
-
-        async function guardarComentario(e) {
-            e.preventDefault();
-            if (!libroActualComentarios) return;
-
-            const nombreInput = document.getElementById('input-nombre');
-            const textoInput = document.getElementById('input-texto');
-
-            const nombre = nombreInput.value.trim();
-            const texto = textoInput.value.trim();
-
-            if (!nombre || !texto) return;
-
-            const { error } = await supabaseClient
-                .from('comentarios')
-                .insert([{ libro_id: libroActualComentarios, nombre: nombre, texto: texto }]);
-
-            if (error) {
-                alert("Error al enviar comentario: " + error.message);
-                return;
-            }
-
-            textoInput.value = "";
-            await cargarComentariosDelLibro(libroActualComentarios);
-
-            const countSpan = document.getElementById(`count-${libroActualComentarios}`);
-            if (countSpan) {
-                countSpan.innerText = parseInt(countSpan.innerText || '0') + 1;
-            }
-        }
-
-        async function iniciarPago(idLibro) {
-            // Si no hay sesión activa de usuario, abrimos el modal de login
-            if (!usuarioSesion) {
-                alert("Para adquirir una licencia digital y asociarla a tu biblioteca, por favor iniciá sesión o registrate.");
-                abrirModal('modal-login');
-                return;
-            }
-
-            const btn = document.getElementById(`btn-${idLibro}`);
-            btn.disabled = true;
-            btn.innerText = "Procesando...";
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/crear-preferencia`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ libro_id: idLibro, user_id: usuarioSesion.id })
-                });
-
-                const data = await response.json();
-
-                if (data.init_point) {
-                    window.location.href = data.init_point; 
-                } else {
-                    alert("Error al iniciar el pago: " + (data.error || "Intente más tarde."));
-                    btn.disabled = false;
-                    btn.innerText = "Adquirir Licencia Digital";
-                }
-            } catch (e) {
-                alert("Error de conexión con el servidor de pagos");
-                btn.disabled = false;
-                btn.innerText = "Adquirir Licencia Digital";
-            }
-        }
-
-        async function inicializarPagina() {
-            await revisarSesion();
-            await cargarDatosAutor();
-            await cargarCatalogo();
-        }
-
-        function enviarMensajeSoporte(e) {
-            e.preventDefault();
-
-            if (!mailAutor) {
-                alert("El servicio de contacto no está disponible en este momento.");
-                return;
-            }
-
-            const asunto = document.getElementById('soporte-asunto').value.trim();
-            const mensaje = document.getElementById('soporte-mensaje').value.trim();
-
-            if (!asunto || !mensaje) return;
-
-            // Abrir el cliente de correo del usuario precompletando destinatario, asunto y cuerpo
-            const mailtoUrl = `mailto:${mailAutor}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(mensaje)}`;
-            window.location.href = mailtoUrl;
-
-            // Limpiar y cerrar modal
-            document.getElementById('soporte-asunto').value = '';
-            document.getElementById('soporte-mensaje').value = '';
-            cerrarModal('modal-soporte');
-        }
-
-        inicializarPagina();
-    </script>
-</body>
 </html>
