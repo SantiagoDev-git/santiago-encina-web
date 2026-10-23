@@ -823,3 +823,47 @@ html {
         gap: 15px;
     }
 }
+
+/* Media query para pantallas pequeñas (Celulares) */
+@media (max-width: 600px) {
+  /* Ajuste de la barra/tarjeta superior */
+  .header-container, 
+  .top-bar, 
+  .user-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  /* Ajuste del área de información del usuario */
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    font-size: 0.85rem;
+    word-break: break-word; /* Evita que correos largos rompan la pantalla */
+    margin-bottom: 5px;
+  }
+
+  /* Contenedor de botones (Soporte y Cerrar Sesión) */
+  .user-actions,
+  .nav-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  /* Botones adaptados al ancho del celu */
+  .btn-header, 
+  .btn-soporte, 
+  .btn-logout {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+}
