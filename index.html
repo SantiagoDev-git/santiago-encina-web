@@ -4,10 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Santiago Encina - Portal del Lector</title>
+
+    <!-- Meta-etiquetas Open Graph (Vista previa para WhatsApp, Facebook, Telegram) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Santiago Encina — Obras de Suspenso e Intriga">
+    <meta property="og:description" content="Descubrí 'Los cuervos de Fernández' y explora el catálogo completo. Descargá muestras gratis o adquirí tu licencia digital para leer al instante.">
+    <meta property="og:image" content="https://kpltcxhnqhgzgxazhgbv.supabase.co/storage/v1/object/public/portadas/los_cuervos_de_fernandez.jpg">
+    <meta property="og:url" content="https://santiagodev-git.github.io/santiago-encina-web/">
+
+    <!-- Compatibilidad para Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Santiago Encina — Obras de Suspenso e Intriga">
+    <meta name="twitter:description" content="Descubrí 'Los cuervos de Fernández' y explora el catálogo completo. Descargá muestras gratis o adquirí tu licencia digital para leer al instante.">
+    <meta name="twitter:image" content="https://kpltcxhnqhgzgxazhgbv.supabase.co/storage/v1/object/public/portadas/los_cuervos_de_fernandez.jpg">
+    
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="styles.css">
-    
+
+    <link rel="icon" type="image/png" href="https://kpltcxhnqhgzgxazhgbv.supabase.co/storage/v1/object/public/portadas/icono.png">
+
 </head>
 <body>
 
@@ -16,6 +32,7 @@
         <div class="navbar-brand">📚 Santiago Encina - Portal</div>
         <div class="navbar-actions" id="nav-actions">
             <button class="btn-nav" onclick="abrirModal('modal-soporte')">Soporte</button>
+            <button class="btn-nav" onclick="compartirSitio()">📤 Compartir</button>
             <button class="btn-nav" onclick="abrirModal('modal-login')">Iniciar Sesión</button>
             <button class="btn-nav btn-nav-primary" onclick="abrirModal('modal-registro')">Registrarse</button>
         </div>
@@ -91,6 +108,13 @@
                     <small class="texto-ayuda">
                         Acá va tu contraseña. Podés usar letras, números y signos (mínimo 6 caracteres). <strong>Guardala en un lugar seguro y no la compartas con nadie.</strong>
                     </small>
+                </div>
+                
+                <div class="campo-grupo" style="display: flex; align-items: flex-start; gap: 10px; margin-top: 15px;">
+                    <input type="checkbox" id="check-politicas" required style="width: auto; margin-top: 4px; cursor: pointer;">
+                    <label for="check-politicas" style="font-size: 0.85em; color: #444; line-height: 1.4;">
+                        Acepto los <a href="legal.html" target="_blank" style="color: #009ee3; text-decoration: underline;">Términos de Servicio y Políticas de Privacidad</a> (Versión 1.0).
+                    </label>
                 </div>
 
                 <!-- Botón de Envío -->
@@ -247,7 +271,7 @@
     <!-- MODAL: BLOQUEO DE DISPOSITIVO -->
     <div id="modal-bloqueo-dispositivo" class="modal-overlay">
         <div class="modal-box" style="max-width: 480px; text-align: center;">
-            <div style="font-size: 32px; margin-bottom: 12px;">📱🔒</div>
+            <div style="font-size: 32px; margin-bottom: 12px;">👤 + 📱 + 🌐 = 🔒</div>
             <h3 style="margin: 0 0 12px 0; font-size: 18px; font-weight: bold; color: #1a1a1a;">Dispositivo no registrado</h3>
             <p style="font-size: 13px; line-height: 1.6; color: #555; margin-bottom: 16px;">
                 Esta obra y tu cuenta de lector ya se encuentran vinculadas a otro dispositivo de lectura.
