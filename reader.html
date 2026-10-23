@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lector Protegido - Santiago Encina</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Prevent selection and drag across the page */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .font-book {
+            font-family: 'Merriweather', serif;
+        }
+
+        .font-heading {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Custom Parchment Theme */
+        .theme-parchment {
+            background-color: #1a1412;
+            color: #382c23;
+        }
+        .theme-parchment .book-page {
+            background-color: #f5eedc;
+            color: #2b221a;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid #e2d3b4;
+        }
+
+        /* Custom Dark Theme */
+        .theme-dark {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+        .theme-dark .book-page {
+            background-color: #1e293b;
+            color: #f1f5f9;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            border: 1px solid #334155;
+        }
+
+        /* High Contrast Senior Theme */
+        .theme-contrast {
+            background-color: #000000;
+            color: #ffffff;
+        }
+        .theme-contrast .book-page {
+            background-color: #ffffff;
+            color: #000000;
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+            border: 3px solid #facc15;
+        }
+
+        /* Anti-print styling */
+        @media print {
+            body {
+                display: none !important;
+            }
+        }
+
+        /* Custom Scrollbar for the reading container */
+        /* Ocultar la barra de desplazamiento manteniendo la funcionalidad de scroll */
+        .reading-scroll {
+            -ms-overflow-style: none;  /* IE y Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        .reading-scroll::-webkit-scrollbar {
+            display: none; /* Chrome, Safari y Opera */
+            width: 0;
+            background: transparent;
+        }
+
+        /* Watermark layer */
+        .watermark-overlay {
+            background-image: repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 100px,
+                rgba(0, 0, 0, 0.015) 100px,
+                rgba(0, 0, 0, 0.015) 200px
+            );
+        }
+
+        /* Estilos tipográficos editoriales para el texto descifrado */
+        .lectura-editorial p {
+            text-align: justify;
+            text-indent: 1.5em;
+            margin-bottom: 0.9em;
+            line-height: 1.75;
+            font-style: normal;
+        }
+
+        .lectura-editorial h1, 
+        .lectura-editorial h2, 
+        .lectura-editorial h3 {
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            margin-top: 1em;
+            margin-bottom: 1em;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body class="theme-parchment min-h-screen flex flex-col transition-colors duration-300">
+
+  <!-- TOP BAR / HEADER -->
+  <header class="w-full bg-stone-900 text-stone-200 px-4 py-3 border-b border-stone-800 flex items-center justify-between shadow-md z-20">
+    <!-- Volver al Inicio -->
+    <div class="flex items-center space-x-3">
+      <a href="index.html" class="bg-stone-800 hover:bg-stone-700 text-amber-300 px-3 py-1.5 rounded-lg border border-stone-700 text-xs font-medium transition flex items-center space-x-1">
+        <span>&larr;</span>
+        <span>Volver al Inicio</span>
+      </a>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex items-center space-x-2 sm:space-x-3">
+      <!-- License Badge -->
+      <div class="hidden md:flex items-center space-x-1.5 bg-emerald-950/80 text-emerald-300 text-xs px-2.5 py-1 rounded-full border border-emerald-800/50">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-medium">Licencia Activa</span>
+      </div>
+
+      <!-- Theme Selector -->
+      <div class="flex bg-stone-800 p-1 rounded-lg border border-stone-700">
+        <button onclick="setTheme('parchment')" title="Modo Pergamino (Sepia)" class="p-1.5 rounded hover:bg-stone-700 text-amber-200 cursor-pointer">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h6a1 1 0 100-2H7zm0 4a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+        </button>
+        <button onclick="setTheme('dark')" title="Modo Oscuro (Noche)" class="p-1.5 rounded hover:bg-stone-700 text-slate-300 cursor-pointer">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+        </button>
+        <button onclick="setTheme('contrast')" title="Modo Alto Contraste (Para mayores)" class="p-1.5 rounded hover:bg-stone-700 text-yellow-400 cursor-pointer">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd"/></svg>
+        </button>
+      </div>
+
+      <!-- Font Size Controls -->
+      <div class="flex items-center bg-stone-800 px-2 py-1 rounded-lg border border-stone-700 text-xs font-bold text-stone-200 space-x-1">
+        <button onclick="changeFontSize(-1)" class="hover:text-amber-400 px-1 py-0.5 cursor-pointer">A-</button>
+        <span id="font-size-label" class="text-[11px] text-stone-400 font-normal">18px</span>
+        <button onclick="changeFontSize(1)" class="hover:text-amber-400 px-1 py-0.5 cursor-pointer">A+</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN READING CANVAS AREA -->
+  <main class="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 relative overflow-hidden">
+    
+    <!-- NARROW PAGE CONTAINER -->
+    <div class="book-page w-full max-w-[440px] rounded-xl p-6 sm:p-8 relative transition-all duration-300 flex flex-col justify-between my-auto">
+      
+      <!-- Watermark Layer Overlay -->
+      <div class="absolute inset-0 watermark-overlay pointer-events-none rounded-xl"></div>
+      <div class="absolute top-2 right-3 text-[10px] opacity-40 font-mono select-none pointer-events-none">
+        SECURE READER - SANTIAGO ENCINA
+      </div>
+
+      <!-- Chapter Header -->
+      <div class="text-center mb-4 border-b border-stone-300/40 pb-3">
+        <h2 id="chapter-title" class="font-heading text-lg sm:text-xl font-bold leading-snug uppercase">Cargando...</h2>
+      </div>
+
+      <!-- SCROLLABLE TEXT CONTENT (Conectado al motor servidor) -->
+      <div id="scroll-container" class="reading-scroll overflow-y-auto max-h-[400px] pr-2 font-book text-[18px] leading-relaxed">
+        <div id="chapter-content" class="text-center py-16 italic opacity-75">
+          Conectando con el servidor...
+        </div>
+      </div>
+
+      <!-- Navigation & Page Counter / Save Button -->
+      <div class="mt-6 pt-3 border-t border-stone-300/40 flex items-center justify-between text-xs font-heading">
+        <button id="btn-anterior" onclick="cambiarCapituloNavegacion(-1)" class="px-3 py-1.5 rounded-lg bg-stone-200/60 hover:bg-stone-300/80 text-stone-700 font-bold transition flex items-center space-x-1 cursor-pointer">
+          <span>&larr;</span>
+          <span>Anterior</span>
+        </button>
+        
+        <button id="btn-guardar" onclick="guardarProgresoActual()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm cursor-pointer border border-amber-500" title="Guardar tu página actual">
+          💾 Guardar
+        </button>
+
+        <button id="btn-siguiente" onclick="cambiarCapituloNavegacion(1)" class="px-3 py-1.5 rounded-lg bg-amber-800 hover:bg-amber-900 text-white font-bold transition flex items-center space-x-1 shadow-sm cursor-pointer">
+          <span>Siguiente</span>
+          <span>&rarr;</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Security Warning Toast -->
+    <div id="security-toast" class="fixed bottom-4 bg-red-900/90 text-white text-xs px-4 py-2 rounded-lg shadow-xl backdrop-blur border border-red-700 opacity-0 transition-opacity duration-300 pointer-events-none z-50">
+      🔒 Función protegida. La copia e impresión están deshabilitadas.
+    </div>
+
+  </main>
+
+  <script>
+            // --- ESTADO DE PREFERENCIAS DE LECTURA ---
+        let currentFontSize = parseInt(localStorage.getItem("reader_font_size")) || 18;
+        let currentTheme = localStorage.getItem("reader_theme") || "parchment";
+
+        // Aplicar preferencias al cargar la página
+        document.addEventListener("DOMContentLoaded", () => {
+            setTheme(currentTheme);
+            changeFontSize(0); // Aplica el tamaño guardado sin alterar el valor
+        });
+
+        // --- FUNCIONES DE CONTROLES (TEMAS Y TAMAÑO) ---
+        function setTheme(theme) {
+            currentTheme = theme;
+            localStorage.setItem("reader_theme", theme); // Guardar preferencia
+            document.body.className = `theme-${theme} min-h-screen flex flex-col transition-colors duration-300`;
+        }
+
+        function changeFontSize(delta) {
+            currentFontSize = Math.min(Math.max(currentFontSize + delta, 14), 28);
+            localStorage.setItem("reader_font_size", currentFontSize); // Guardar preferencia
+
+            const contentContainer = document.getElementById("chapter-content");
+            if (contentContainer) {
+                contentContainer.style.fontSize = `${currentFontSize}px`;
+            }
+            
+            const label = document.getElementById("font-size-label");
+            if (label) {
+                label.textContent = `${currentFontSize}px`;
+            }
+        }
+
+    // --- SECURITY & FRICTION ANTI-COPY LAYERS ---
+    function showToast(msg) {
+      const toast = document.getElementById('security-toast');
+      if (msg) toast.textContent = msg;
+      toast.style.opacity = '1';
+      setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+    }
+
+    // Block Right Click
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showToast('🔒 El menú contextual está deshabilitado.');
+    });
+
+    // Block Copy, Cut, Print & Developer Keyboard Shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (
+        (e.ctrlKey && ['c', 'u', 'p', 's', 'a'].includes(e.key.toLowerCase())) ||
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && ['i', 'j', 'c'].includes(e.key.toLowerCase()))
+      ) {
+        e.preventDefault();
+        showToast('🔒 Acción bloqueada por seguridad.');
+      }
+    });
+
+    // Clear clipboard if copy attempt succeeds
+    document.addEventListener('copy', (e) => {
+      e.preventDefault();
+      showToast('🔒 Copia de texto deshabilitada.');
+    });
+  </script>
+
+  <!-- SDK de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Motor lógico seguro de descifrado y navegación -->
+  <script src="reader-engine.js"></script>
+
+  <!-- Modal Bloqueo de Dispositivo -->
+    <div id="modal-bloqueo-dispositivo" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: #1c1917; border: 1px solid #d97706; border-radius: 16px; max-width: 480px; width: 100%; padding: 24px; color: #fef3c7; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); font-family: sans-serif;">
+            <div style="font-size: 32px; margin-bottom: 12px; text-align: center;">📱🔒</div>
+            <h3 style="margin: 0 0 12px 0; font-size: 18px; font-weight: bold; text-align: center; color: #ffffff;">Dispositivo no registrado</h3>
+            <p style="font-size: 13px; line-height: 1.6; color: #d6d3d1; text-align: center; margin-bottom: 16px;">
+                Esta obra y tu cuenta de lector ya se encuentran vinculadas a otro dispositivo de lectura.
+            </p>
+            <p style="font-size: 12px; line-height: 1.5; color: #fbbf24; background: rgba(217, 119, 6, 0.15); border: 1px dashed #d97706; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                ℹ️ <strong>¿Cambiaste de teléfono o tablet?</strong><br>
+                Contactate con Soporte para desvincular tu equipo anterior. Por favor tené a mano tu <strong>ticket o comprobante de compra de Mercado Pago</strong> para verificar la titularidad.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="cerrarModalDispositivo()" style="flex: 1; padding: 10px; background: #374151; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Entendido</button>
+                <button onclick="irASoporteDesdeBloqueo()" style="flex: 1; padding: 10px; background: #009ee3; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">💬 Contactar Soporte</button>
+            </div>
+        </div>
+    </div>
+
+    
+
+</body>
+</html>
